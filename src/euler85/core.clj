@@ -56,6 +56,7 @@
     (map (partial distance-from max-total))
     (apply min)))
 
+
 (defn calc-euler-85
   [max-total]
   (let [max-square-size (analyze-square-size max-total)
@@ -63,11 +64,12 @@
                           (range 1 (inc max-square-size))
                           (map calc-column)
                           (map-indexed cons))
-        column-j        (apply min-key (partial min-column-fn max-total) indexed-columns)]
-    [(first column-j) (count column-j)]))
+        column-j        (apply min-key (partial min-column-fn max-total) indexed-columns)
+		trimmed-column  (take-while #(< % max-total) column-j)]
+    [(first trimmed-column) (count trimmed-column)]))
 
 (defn -main
   "Euler 85"
   [& args]
-  (let [max-total 5]
+  (let [max-total 20000000]
     (println (calc-euler-85 max-total))))
