@@ -17,7 +17,7 @@
   [n xs]
   (->>
     (range n)
-    (map #(drop %  xs))
+    (map #(drop % xs))
     (apply map vector)))
 
 (defn analyze-square-size
@@ -28,18 +28,19 @@
     (take-while #(< % max-total))
     (count)))
 
-(defn calc-columns
+(defn calc-column
   [i]
-  (let [start-num (square (nChoose2 i))]
+  (let [iC2 (nChoose2 i)
+        start-num (square (nChoose2 (dec i)))]
     (->>
-      (range)
-      (drop start-num)
-      (reductions (fn [prev j] (+ (nChoose2 j) prev))))))
+      (iterate inc start-num)
+      (reductions (fn [prev j] (+ iC2 prev))))))
 
 (defn last-2-while-less-than
   [max-total xs]
   (->>
-    (tuplize 2 xs)
+    xs
+    (tuplize 2)
     (drop-while #(< (first %) max-total))
     first))
 
@@ -51,18 +52,18 @@
   [max-total xs]
   (->>
     xs
-    (partial last-2-while-less-than max-total)
+    (last-2-while-less-than max-total)
     (map (partial distance-from max-total))
     (apply min)))
 
 (defn calc-euler-85
   [max-total]
-  (let [max-square-size  (analyze-square-size max-total)
+  (let [max-square-size (analyze-square-size max-total)
         indexed-columns (->>
-                          (range max-square-size)
-                          (map calc-columns)
-                          (map-indexed #(cons %1 %2)))
-        column-j (min-key #(min-column-fn max-total %) indexed-columns)]
+                          (range 1 (inc max-square-size))
+                          (map calc-column)
+                          (map-indexed cons))
+        column-j        (apply min-key (partial min-column-fn max-total) indexed-columns)]
     [(first column-j) (count column-j)]))
 
 (defn -main
